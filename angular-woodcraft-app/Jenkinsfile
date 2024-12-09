@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        NODE_VERSION = '16'  // Set the Node.js version you need
+        NODE_VERSION = '19'  // Set the Node.js version you need
         VM_IP = "10.0.0.2"  // Replace with your VM's IP
         DEPLOY_DIR = "/var/www/angular-woodcraft-app/browser"  // Path on the VM
         BUILD_DIR = "dist/angular-woodcraft-app"  // Angular build output directory
@@ -73,11 +73,26 @@ pipeline {
             }
         }
 
-        // stage('Build Application') {
-        //     steps {
-        //         sh 'ng build --configuration production'
-        //     }
-        // }
+        stage('Build Application') {
+            steps {
+                script {
+                    // Check if Angular CLI (ng) is installed
+                    sh '''
+                    if ! command -v ng &> /dev/null
+                    then
+                        echo "Angular CLI (ng) not found, installing Angular CLI..."
+                        npm install -g @angular/cli
+                    else
+                        echo "Angular CLI (ng) is already installed"
+                    fi
+
+                    # Build the application
+                    ng build --configuration production
+                    '''
+                }
+            }
+        }
+
 
         // stage('Deploy to VM') {
         //     steps {
