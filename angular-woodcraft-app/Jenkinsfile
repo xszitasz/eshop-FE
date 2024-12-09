@@ -66,27 +66,27 @@ pipeline {
             }
         }
 
-        stage('Build Application') {
-            steps {
-                sh 'ng build --configuration production'
-            }
-        }
+        // stage('Build Application') {
+        //     steps {
+        //         sh 'ng build --configuration production'
+        //     }
+        // }
 
-        stage('Deploy to VM') {
-            steps {
-                script {
-                    // Copy files to VM via scp
-                    sh """
-                    scp -r ${BUILD_DIR}/. ${USER}@${VM_IP}:${DEPLOY_DIR}
-                    """
+        // stage('Deploy to VM') {
+        //     steps {
+        //         script {
+        //             // Copy files to VM via scp
+        //             sh """
+        //             scp -r ${BUILD_DIR}/. ${USER}@${VM_IP}:${DEPLOY_DIR}
+        //             """
 
-                    // Restart NGINX on the VM
-                    sh """
-                    ssh ${USER}@${VM_IP} 'sudo systemctl restart nginx'
-                    """
-                }
-            }
-        }
+        //             // Restart NGINX on the VM
+        //             sh """
+        //             ssh ${USER}@${VM_IP} 'sudo systemctl restart nginx'
+        //             """
+        //         }
+        //     }
+        // }
     }
 
     post {
