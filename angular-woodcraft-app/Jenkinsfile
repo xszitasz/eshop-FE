@@ -12,6 +12,7 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
+                // Clone the repository with the URL and branch
                 git branch: 'main', url: 'https://github.com/xszitasz/eshop-FE'
             }
         }
@@ -19,40 +20,43 @@ pipeline {
         stage('Verify package.json') {
             steps {
                 script {
-                    // Check if package.json exists
-                    if (!fileExists('package.json')) {
-                        error "package.json not found in the workspace. Aborting npm install."
+                    // Check if package.json exists in the correct directory (angular-woodcraft-app)
+                    if (!fileExists('angular-woodcraft-app/package.json')) {
+                        error "package.json not found in the 'angular-woodcraft-app' directory. Aborting npm install."
+                    } else {
+                        echo "package.json found in the 'angular-woodcraft-app' directory."
                     }
                 }
             }
         }
 
-        stage('Install Dependencies') {
-            steps {
-                script {
-                    // Install Node.js and npm if they are not already installed
-                    sh '''
-                    if ! command -v npm &> /dev/null
-                    then
-                        echo "npm not found, installing Node.js and npm..."
-                        # Install nvm (Node Version Manager)
-                        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+        // stage('Install Dependencies') {
+        //     steps {
+        //         script {
+        //             // Install Node.js and npm if they are not already installed
+        //             sh '''
+        //             if ! command -v npm &> /dev/null
+        //             then
+        //                 echo "npm not found, installing Node.js and npm..."
 
-                        # Ensure nvm is loaded properly by sourcing nvm.sh
-                        export NVM_DIR="$HOME/.nvm"
-                        [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
+        //                 # Install nvm (Node Version Manager)
+        //                 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+
+        //                 # Ensure nvm is loaded properly by sourcing nvm.sh
+        //                 export NVM_DIR="$HOME/.nvm"
+        //                 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
                         
-                        # Install the specified Node.js version
-                        nvm install ${NODE_VERSION}
-                        nvm use ${NODE_VERSION}
-                    else
-                        echo "npm is already installed"
-                    fi
-                    npm install
-                    '''
-                }
-            }
-        }
+        //                 # Install the specified Node.js version
+        //                 nvm install ${NODE_VERSION}
+        //                 nvm use ${NODE_VERSION}
+        //             else
+        //                 echo "npm is already installed"
+        //             fi
+        //             npm install
+        //             '''
+        //         }
+        //     }
+        // }
 
         stage('Build Application') {
             steps {
