@@ -20,7 +20,11 @@ pipeline {
                         echo "npm not found, installing Node.js and npm..."
                         # Install nvm (Node Version Manager)
                         curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
-                        source ~/.bashrc
+
+                        # Ensure nvm is loaded properly by sourcing nvm.sh
+                        export NVM_DIR="$HOME/.nvm"
+                        [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
+                        
                         # Install the specified Node.js version
                         nvm install ${NODE_VERSION}
                         nvm use ${NODE_VERSION}
