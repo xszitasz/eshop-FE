@@ -57,12 +57,17 @@ pipeline {
             }
         }
 
-        stage('Directory change') {
+        stage('Directory Change') {
             steps {
                 script {
+                    // Change to the project directory and run npm install
                     dir('angular-woodcraft-app') {
-                        // Run npm install and show full output for debugging
-                        sh 'npm install'
+                        // Ensure npm is available in the current shell session
+                        sh '''
+                        export NVM_DIR="$HOME/.nvm"
+                        [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
+                        npm install
+                        '''
                     }
                 }
             }
