@@ -76,39 +76,41 @@ pipeline {
         stage('Build Application') {
             steps {
                 script {
-                    // Check if Angular CLI (ng) is installed
-                    sh '''
-                    if ! command -v ng &> /dev/null
-                    then
-                        echo "Angular CLI (ng) not found, installing Angular CLI..."
-                        npm install -g @angular/cli
-                    else
-                        echo "Angular CLI (ng) is already installed"
-                    fi
+                    dir('angular-woodcraft-app') {
+                        // Check if Angular CLI (ng) is installed
+                        sh '''
+                        if ! command -v ng &> /dev/null
+                        then
+                            echo "Angular CLI (ng) not found, installing Angular CLI..."
+                            npm install -g @angular/cli
+                        else
+                            echo "Angular CLI (ng) is already installed"
+                        fi
 
-                    # Build the application
-                    ng build --configuration production
-                    '''
+                        # Build the application
+                        ng build --configuration production
+                        '''
+                    }
                 }
             }
         }
 
 
-        // stage('Deploy to VM') {
-        //     steps {
-        //         script {
-        //             // Copy files to VM via scp
-        //             sh """
-        //             scp -r ${BUILD_DIR}/. ${USER}@${VM_IP}:${DEPLOY_DIR}
-        //             """
+        stage('Deploy to VM') {
+            steps {
+                script {
+                    // Copy files to VM via scp
+                    sh """
+                    scp -r ${BUILD_DIR}/. ${USER}@${VM_IP}:${DEPLOY_DIR}
+                    """
 
-        //             // Restart NGINX on the VM
-        //             sh """
-        //             ssh ${USER}@${VM_IP} 'sudo systemctl restart nginx'
-        //             """
-        //         }
-        //     }
-        // }
+                    // Restart NGINX on the VM
+                    sh """
+                    ssh ${USER}@${VM_IP} 'sudo systemctl restart nginx'
+                    """
+                }
+            }
+        }
     }
 
     post {
