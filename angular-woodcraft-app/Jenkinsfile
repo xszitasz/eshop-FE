@@ -58,12 +58,10 @@ pipeline {
         }
 
         stage('Directory change') {
-            steps {
-                script {
-                    dir('angular-woodcraft-app') {
-                        // Run npm install in the angular-woodcraft-app directory
-                        sh 'npm install > /dev/null 2>&1'
-                    }
+            script {
+                dir('angular-woodcraft-app') {
+                    // Run npm install and show full output for debugging
+                    sh 'npm install'
                 }
             }
         }
