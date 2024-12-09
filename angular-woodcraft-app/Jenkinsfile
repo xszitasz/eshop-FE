@@ -1,0 +1,52 @@
+pipeline {
+    agent any
+
+    environment {
+        VM_IP = "10.0.0.2"  // Replace with your VM's IP
+        DEPLOY_DIR = "/var/www/angular-woodcraft-app/browser"  // Path on the VM
+        BUILD_DIR = "dist/angular-woodcraft-app"  // Angular build output directory
+        USER = "zoltan-szitas"  // SSH user for the VM
+    }
+
+    stages {
+        stage('Clone Repository') {
+            steps {
+                git branch: 'main', url: 'https://github.com/xszitasz/eshop-FE'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                sh 'npm install'
+            }
+        }
+
+        stage('Build Application') {
+            steps {
+                sh 'ng build --configuration production'
+            }
+        }
+
+        stage('Deploy to VM') {
+            steps {
+                script {
+                    // Copy files to VM via scp
+                    sh """
+                    scp -r ${BUILD_DIR}/. ${USER}@${VM_IP}:${DEPLOY_DIR}
+                    """
+
+                    // Restart NGINX on the VM
+                    sh """
+                    ssh ${USER}@${VM_IP} 'sudo systemctl restart nginx'
+                    """
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Deployment completed!'
+        }
+    }
+}
