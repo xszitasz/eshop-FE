@@ -57,7 +57,7 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Directory change') {
             steps {
                 script {
                     dir('angular-woodcraft-app') {
