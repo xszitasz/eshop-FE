@@ -2,6 +2,7 @@ pipeline {
     agent any
 
     environment {
+        NODE_VERSION = '16'  // Set the Node.js version you need
         VM_IP = "10.0.0.2"  // Replace with your VM's IP
         DEPLOY_DIR = "/var/www/angular-woodcraft-app/browser"  // Path on the VM
         BUILD_DIR = "dist/angular-woodcraft-app"  // Angular build output directory
@@ -9,6 +10,29 @@ pipeline {
     }
 
     stages {
+        stage('Install Dependencies') {
+            steps {
+                script {
+                    // Install Node.js and npm if they are not already installed
+                    sh '''
+                    if ! command -v npm &> /dev/null
+                    then
+                        echo "npm not found, installing Node.js and npm..."
+                        # Install nvm (Node Version Manager)
+                        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+                        source ~/.bashrc
+                        # Install the specified Node.js version
+                        nvm install ${NODE_VERSION}
+                        nvm use ${NODE_VERSION}
+                    else
+                        echo "npm is already installed"
+                    fi
+                    npm install
+                    '''
+                }
+            }
+        }
+        
         stage('Clone Repository') {
             steps {
                 git branch: 'main', url: 'https://github.com/xszitasz/eshop-FE'
