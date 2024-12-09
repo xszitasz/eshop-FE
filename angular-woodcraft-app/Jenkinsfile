@@ -30,33 +30,33 @@ pipeline {
             }
         }
 
-        // stage('Install Dependencies') {
-        //     steps {
-        //         script {
-        //             // Install Node.js and npm if they are not already installed
-        //             sh '''
-        //             if ! command -v npm &> /dev/null
-        //             then
-        //                 echo "npm not found, installing Node.js and npm..."
+        stage('Install Dependencies') {
+            steps {
+                script {
+                    // Install Node.js and npm if they are not already installed
+                    sh '''
+                    if ! command -v npm &> /dev/null
+                    then
+                        echo "npm not found, installing Node.js and npm..."
 
-        //                 # Install nvm (Node Version Manager)
-        //                 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+                        # Install nvm (Node Version Manager)
+                        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
 
-        //                 # Ensure nvm is loaded properly by sourcing nvm.sh
-        //                 export NVM_DIR="$HOME/.nvm"
-        //                 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
+                        # Ensure nvm is loaded properly by sourcing nvm.sh
+                        export NVM_DIR="$HOME/.nvm"
+                        [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
                         
-        //                 # Install the specified Node.js version
-        //                 nvm install ${NODE_VERSION}
-        //                 nvm use ${NODE_VERSION}
-        //             else
-        //                 echo "npm is already installed"
-        //             fi
-        //             npm install
-        //             '''
-        //         }
-        //     }
-        // }
+                        # Install the specified Node.js version
+                        nvm install ${NODE_VERSION}
+                        nvm use ${NODE_VERSION}
+                    else
+                        echo "npm is already installed"
+                    fi
+                    npm install
+                    '''
+                }
+            }
+        }
 
         stage('Build Application') {
             steps {
