@@ -10,6 +10,23 @@ pipeline {
     }
 
     stages {
+        stage('Clone Repository') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Verify package.json') {
+            steps {
+                script {
+                    // Check if package.json exists
+                    if (!fileExists('package.json')) {
+                        error "package.json not found in the workspace. Aborting npm install."
+                    }
+                }
+            }
+        }
+
         stage('Install Dependencies') {
             steps {
                 script {
@@ -34,12 +51,6 @@ pipeline {
                     npm install
                     '''
                 }
-            }
-        }
-
-        stage('Clone Repository') {
-            steps {
-                git branch: 'main', url: 'https://github.com/xszitasz/eshop-FE'
             }
         }
 
