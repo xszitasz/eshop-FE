@@ -2,6 +2,7 @@ pipeline {
     agent any
 
     environment {
+        // Define the environment variables
         NODE_VERSION = '19'  // Set the Node.js version
         NPM_VERSION = '10'   // Expected npm version
         VM_IP = "10.0.0.2"  // VM's IP
