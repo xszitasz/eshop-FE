@@ -3,13 +3,35 @@ pipeline {
 
     environment {
         NODE_VERSION = '19'  // Set the Node.js version
+        NPM_VERSION = '10'   // Expected npm version
         VM_IP = "10.0.0.2"  // VM's IP
         DEPLOY_DIR = "/var/www/angular-woodcraft-app/browser"  // Path on the VM
-        BUILD_DIR = "dist/angular-woodcraft-app"  // Angular build output directory
-        USER = "zoltan-szitas"  // SSH user for the VM
     }
 
     stages {
+        stage('Verify Node and npm Versions') {
+            steps {
+                script {
+                    // Verify the Node.js version
+                    def nodeVersion = sh(script: 'node --version', returnStdout: true).trim()
+                    def npmVersion = sh(script: 'npm --version', returnStdout: true).trim()
+
+                    if (!nodeVersion.startsWith("v${NODE_VERSION}")) {
+                        error "Node.js version mismatch. Expected: v${NODE_VERSION}, Found: ${nodeVersion}"
+                    } else {
+                        echo "Node.js version is correct: ${nodeVersion}"
+                    }
+
+                    // Verify the npm version
+                    if (!npmVersion.startsWith("${NPM_VERSION}")) {
+                        error "npm version mismatch. Expected: ${NPM_VERSION}, Found: ${npmVersion}"
+                    } else {
+                        echo "npm version is correct: ${npmVersion}"
+                    }
+                }
+            }
+        }
+
         stage('Clone Repository') {
             steps {
                 // Clone the repository with the URL and branch
@@ -28,94 +50,6 @@ pipeline {
                     }
                 }
             }
-        }
-
-        stage('Install Dependencies') {
-            steps {
-                script {
-                    // Install Node.js and npm if they are not already installed
-                    sh '''
-                    if ! command -v npm &> /dev/null
-                    then
-                        echo "npm not found, installing Node.js and npm..."
-
-                        # Install nvm (Node Version Manager)
-                        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
-
-                        # Ensure nvm is loaded properly by sourcing nvm.sh
-                        export NVM_DIR="$HOME/.nvm"
-                        [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
-                        
-                        # Install the specified Node.js version
-                        nvm install ${NODE_VERSION}
-                        nvm use ${NODE_VERSION}
-                    else
-                        echo "npm is already installed"
-                    fi
-                    '''
-                }
-            }
-        }
-
-        stage('Directory Change') {
-            steps {
-                script {
-                    // Change to the project directory and run npm install
-                    dir('angular-woodcraft-app') {
-                        // Ensure npm is available in the current shell session
-                        sh '''
-                        export NVM_DIR="$HOME/.nvm"
-                        [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
-                        npm install
-                        '''
-                    }
-                }
-            }
-        }
-
-        stage('Build Application') {
-            steps {
-                script {
-                    dir('angular-woodcraft-app') {
-                        // Check if Angular CLI (ng) is installed
-                        sh '''
-                        if ! command -v ng &> /dev/null
-                        then
-                            echo "Angular CLI (ng) not found, installing Angular CLI..."
-                            npm install -g @angular/cli
-                        else
-                            echo "Angular CLI (ng) is already installed"
-                        fi
-
-                        # Build the application
-                        ng build --configuration production
-                        '''
-                    }
-                }
-            }
-        }
-
-
-        stage('Deploy to VM') {
-            steps {
-                script {
-                    // Copy files to VM via scp
-                    sh """
-                    scp -r ${BUILD_DIR}/. ${USER}@${VM_IP}:${DEPLOY_DIR}
-                    """
-
-                    // Restart NGINX on the VM
-                    sh """
-                    ssh ${USER}@${VM_IP} 'sudo systemctl restart nginx'
-                    """
-                }
-            }
-        }
-    }
-
-    post {
-        always {
-            echo 'Deployment completed!'
         }
     }
 }
