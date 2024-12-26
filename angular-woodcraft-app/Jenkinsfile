@@ -1,13 +1,13 @@
 pipeline {
     agent any
 
-    environment {
-        // Define the environment variables
-        NODE_VERSION = '19'  // Set the Node.js version
-        NPM_VERSION = '10'   // Expected npm version
-        VM_IP = "10.0.0.2"  // VM's IP
-        DEPLOY_DIR = "/var/www/angular-woodcraft-app/browser"  // Path on the VM
-    }
+    // environment {
+    //     // Define the environment variables
+    //     NODE_VERSION = '19'  // Set the Node.js version
+    //     NPM_VERSION = '10'   // Expected npm version
+    //     VM_IP = "10.0.0.2"  // VM's IP
+    //     DEPLOY_DIR = "/var/www/angular-woodcraft-app/browser"  // Path on the VM
+    // }
 
     stages {
         stage('SSH Test') {
@@ -18,50 +18,50 @@ pipeline {
             }
         }
 
-        stage('Verify Node and npm Versions') {
-            steps {
-                script {
-                    // Verify the Node.js version
-                    def nodeVersion = sh(script: 'node --version', returnStdout: true).trim()
-                    def npmVersion = sh(script: 'npm --version', returnStdout: true).trim()
+        // stage('Verify Node and npm Versions') {
+        //     steps {
+        //         script {
+        //             // Verify the Node.js version
+        //             def nodeVersion = sh(script: 'node --version', returnStdout: true).trim()
+        //             def npmVersion = sh(script: 'npm --version', returnStdout: true).trim()
 
-                    if (!nodeVersion.startsWith("v${NODE_VERSION}")) {
-                        error "Node.js version mismatch. Expected: v${NODE_VERSION}, Found: ${nodeVersion}"
-                    } else {
-                        echo "Node.js version is correct: ${nodeVersion}"
-                    }
+        //             if (!nodeVersion.startsWith("v${NODE_VERSION}")) {
+        //                 error "Node.js version mismatch. Expected: v${NODE_VERSION}, Found: ${nodeVersion}"
+        //             } else {
+        //                 echo "Node.js version is correct: ${nodeVersion}"
+        //             }
 
-                    // Verify the npm version
-                    if (!npmVersion.startsWith("${NPM_VERSION}")) {
-                        error "npm version mismatch. Expected: ${NPM_VERSION}, Found: ${npmVersion}"
-                    } else {
-                        echo "npm version is correct: ${npmVersion}"
-                    }
-                }
-            }
-        }
+        //             // Verify the npm version
+        //             if (!npmVersion.startsWith("${NPM_VERSION}")) {
+        //                 error "npm version mismatch. Expected: ${NPM_VERSION}, Found: ${npmVersion}"
+        //             } else {
+        //                 echo "npm version is correct: ${npmVersion}"
+        //             }
+        //         }
+        //     }
+        // }
 
-        stage('Clone Repository') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'github-webhook-user', usernameVariable: 'JENKINS_USER', passwordVariable: 'JENKINS_PASSWORD')]) {
-                    // Use the credentials within this block
-                    git branch: 'main', url: 'https://github.com/xszitasz/eshop-FE'
-                    // Rest of your build steps 
-                }
-            }
-        }
+        // stage('Clone Repository') {
+        //     steps {
+        //         withCredentials([usernamePassword(credentialsId: 'github-webhook-user', usernameVariable: 'JENKINS_USER', passwordVariable: 'JENKINS_PASSWORD')]) {
+        //             // Use the credentials within this block
+        //             git branch: 'main', url: 'https://github.com/xszitasz/eshop-FE'
+        //             // Rest of your build steps 
+        //         }
+        //     }
+        // }
 
-        stage('Verify package.json') {
-            steps {
-                script {
-                    // Check if package.json exists in the correct directory (angular-woodcraft-app)
-                    if (!fileExists('angular-woodcraft-app/package.json')) {
-                        error "package.json not found in the 'angular-woodcraft-app' directory. Aborting npm install."
-                    } else {
-                        echo "package.json found in the 'angular-woodcraft-app' directory."
-                    }
-                }
-            }
-        }
+        // stage('Verify package.json') {
+        //     steps {
+        //         script {
+        //             // Check if package.json exists in the correct directory (angular-woodcraft-app)
+        //             if (!fileExists('angular-woodcraft-app/package.json')) {
+        //                 error "package.json not found in the 'angular-woodcraft-app' directory. Aborting npm install."
+        //             } else {
+        //                 echo "package.json found in the 'angular-woodcraft-app' directory."
+        //             }
+        //         }
+        //     }
+        // }
     }
 }
