@@ -12,7 +12,7 @@ pipeline {
     stages {
         stage('SSH Test') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'woodcraft-app', usernameVariable: 'JENKINS_USER', passwordVariable: 'JENKINS_PASSWORD')]) {
+                withCredentials([usernamePassword(credentialsId: 'woodcraft-app', usernameVariable: 'JENKINS_USER')]) {
                 sh "ssh -p 22 ${JENKINS_USER}@${VM_IP} 'echo \"SSH connection successful!\"" 
                 }
             }
